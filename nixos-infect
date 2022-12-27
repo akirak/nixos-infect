@@ -322,11 +322,12 @@ infect() {
 
   export NIXOS_CONFIG="${NIXOS_CONFIG:-/etc/nixos/configuration.nix}"
 
-  nix-env --set \
-    -I nixpkgs=$HOME/.nix-defexpr/channels/nixos \
-    -f '<nixpkgs/nixos>' \
-    -p /nix/var/nix/profiles/system \
-    -A system
+  # https://github.com/elitak/nixos-infect/issues/108#issuecomment-1227339166
+  nix \
+      --extra-experimental-features "nix-command flakes" \
+  build \
+      --profile /nix/var/nix/profiles/system \
+      "${FLAKE_URL}#nixosConfigurations.${NIXOS_CONFIG_NAME}.config.system.build.toplevel"
 
   # Remove nix installed with curl | bash
   rm -fv /nix/var/nix/profiles/default*
